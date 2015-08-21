@@ -8,6 +8,10 @@
 
 import os.path as osp
 import socket
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 
 from spyderlib.qt.QtGui import (QWidget, QVBoxLayout, QHBoxLayout, QMenu,
                                 QToolButton, QMessageBox, QApplication,
@@ -515,7 +519,17 @@ class NamespaceBrowser(QWidget):
                     if error_message is None:
                         interpreter.namespace.update(namespace)
                 else:
-                    error_message = monitor_load_globals(self._get_sock(),
+                    data, error_message = load_func(self.filename)
+                    if pd is not None and data is not None and (
+                            isinstance(data, pd.DataFrame) or
+                            isinstance(data, pd.Series)
+                    ):
+                        base_name = '.'.join(osp.basename(filename).split('.')[:-1])
+                        var_name = fix_reference_name(base_name)
+                        monitor_set_global(self._get_sock(),
+                                           var_name, data)
+                    else:
+                        error_message = monitor_load_globals(self._get_sock(),
                                                          self.filename, ext)
                 QApplication.restoreOverrideCursor()
                 QApplication.processEvents()
