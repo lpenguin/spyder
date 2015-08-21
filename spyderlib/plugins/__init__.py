@@ -125,7 +125,7 @@ class TabFilter(QObject):
             return True
         if event_type == QEvent.MouseButtonRelease:
             self.tab_released(event)
-            return True
+            return False
         return False
 
     def tab_pressed(self, event):
