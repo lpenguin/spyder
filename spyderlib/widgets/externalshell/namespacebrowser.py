@@ -437,11 +437,16 @@ class NamespaceBrowser(QWidget):
         """Collapse"""
         self.sig_collapse.emit()
 
-    # FIXME: This method raises an error when called from the button in the UI
+
     @Slot(list)
     def import_data(self, filenames=None):
         """Import data from text file"""
         title = _("Import data")
+
+        # Fixing error below
+        # FIXME: This method raises an error when called from the button in the UI
+        if isinstance(filenames, bool):
+            filenames = None
         if filenames is None:
             if self.filename is None:
                 basedir = getcwd()
